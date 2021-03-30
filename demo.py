@@ -69,7 +69,7 @@ def demo(args):
                  glob.glob(os.path.join(args.path, '*.jpg'))
         
         images = sorted(images)
-        out = Parallel(n_jobs=8)(delayed(proc_image_pair)(imfile1, imfile2, index, model) for index, (imfile1, imfile2) in enumerate(tqdm(zip(images[:-1], images[1:]))))
+        out = Parallel(n_jobs=4)(delayed(proc_image_pair)(imfile1, imfile2, index, model) for index, (imfile1, imfile2) in enumerate(tqdm(zip(images[:-1], images[1:]))))
         
             
 
