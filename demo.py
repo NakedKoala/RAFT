@@ -12,6 +12,7 @@ from PIL import Image
 from raft import RAFT
 from utils import flow_viz
 from utils.utils import InputPadder
+from tqdm import tqdm
 
 
 
@@ -23,9 +24,11 @@ def load_image(imfile):
     return img[None].to(DEVICE)
 
 
-def viz(img, flo):
+def viz(img, flo, count):
+    print(f' viz called with count: {count}')
     img = img[0].permute(1,2,0).cpu().numpy()
     flo = flo[0].permute(1,2,0).cpu().numpy()
+ 
     
     # map flow to rgb image
     flo = flow_viz.flow_to_image(flo)
@@ -34,10 +37,23 @@ def viz(img, flo):
     # import matplotlib.pyplot as plt
     # plt.imshow(img_flo / 255.0)
     # plt.show()
+    # import pdb 
+    # pdb.set_trace()
+    # cv2.imwrite(f'/content/demo/{count}.png', img_flo[:, :, [2,1,0]]/255.0)
+    cv2.imwrite(f'/content/demo/{str(count).zfill(5)}.png', img_flo)
+    # cv2.imshow('image', img_flo[:, :, [2,1,0]]/255.0)
+    # cv2.waitKey()
 
-    cv2.imshow('image', img_flo[:, :, [2,1,0]]/255.0)
-    cv2.waitKey()
+def proc_image_pair(imfile1, imfile2, count):
 
+    image1 = load_image(imfile1)
+    image2 = load_image(imfile2)
+
+    padder = InputPadder(image1.shape)
+    image1, image2 = padder.pad(image1, image2)
+
+    flow_low, flow_up = model(image1, image2, iters=20, test_mode=True)
+    viz(image1, flow_up, count)
 
 def demo(args):
     model = torch.nn.DataParallel(RAFT(args))
@@ -52,15 +68,9 @@ def demo(args):
                  glob.glob(os.path.join(args.path, '*.jpg'))
         
         images = sorted(images)
-        for imfile1, imfile2 in zip(images[:-1], images[1:]):
-            image1 = load_image(imfile1)
-            image2 = load_image(imfile2)
-
-            padder = InputPadder(image1.shape)
-            image1, image2 = padder.pad(image1, image2)
-
-            flow_low, flow_up = model(image1, image2, iters=20, test_mode=True)
-            viz(image1, flow_up)
+        out = Parallel(n_jobs=8)(delayed(proc_image_pair)(imfile1, imfile2, index) for index, (imfile1, imfile2) in tqdm(enumerate(zip(images[:-1], images[1:]))))
+        
+            
 
 
 if __name__ == '__main__':
