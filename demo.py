@@ -26,9 +26,9 @@ def load_image(imfile):
 
 
 def viz(img, flo, count):
-    print(f' viz called with count: {count}')
-    img = img[0].permute(1,2,0).cpu().numpy()
-    flo = flo[0].permute(1,2,0).cpu().numpy()
+    # print(f' viz called with count: {count}')
+    img = img[0].permute(1,2,0).detach().cpu().numpy()
+    flo = flo[0].permute(1,2,0).detach().cpu().numpy()
  
     
     # map flow to rgb image
