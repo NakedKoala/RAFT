@@ -24,7 +24,7 @@ def load_image(imfile):
 
 
 def viz(img, flo, count):
-    print(f' viz called with count: {count}')
+    # print(f' viz called with count: {count}')
     img = img[0].permute(1,2,0).cpu().numpy()
     flo = flo[0].permute(1,2,0).cpu().numpy()
      
@@ -66,7 +66,7 @@ def demo(args):
                  glob.glob(os.path.join(args.path, '*.jpg'))
         
         images = sorted(images)
-        for imfile1, imfile2 in zip(images[:-1], images[1:]):
+        for index, (imfile1, imfile2) in enumerate(zip(images[:-1], images[1:])):
             image1 = load_image(imfile1)
             image2 = load_image(imfile2)
 
