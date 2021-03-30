@@ -74,7 +74,7 @@ def demo(args):
             image1, image2 = padder.pad(image1, image2)
 
             flow_low, flow_up = model(image1, image2, iters=20, test_mode=True)
-            viz(image1, flow_up)
+            viz(image1, flow_up, index)
 
 
 if __name__ == '__main__':
