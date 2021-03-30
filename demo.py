@@ -45,7 +45,7 @@ def viz(img, flo, count):
     # cv2.imshow('image', img_flo[:, :, [2,1,0]]/255.0)
     # cv2.waitKey()
 
-def proc_image_pair(imfile1, imfile2, count):
+def proc_image_pair(imfile1, imfile2, count, model):
 
     image1 = load_image(imfile1)
     image2 = load_image(imfile2)
@@ -69,7 +69,7 @@ def demo(args):
                  glob.glob(os.path.join(args.path, '*.jpg'))
         
         images = sorted(images)
-        out = Parallel(n_jobs=8)(delayed(proc_image_pair)(imfile1, imfile2, index) for index, (imfile1, imfile2) in tqdm(enumerate(zip(images[:-1], images[1:]))))
+        out = Parallel(n_jobs=8)(delayed(proc_image_pair)(imfile1, imfile2, index, model) for index, (imfile1, imfile2) in enumerate(tqdm(zip(images[:-1], images[1:]))))
         
             
 
