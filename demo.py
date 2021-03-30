@@ -12,8 +12,6 @@ from PIL import Image
 from raft import RAFT
 from utils import flow_viz
 from utils.utils import InputPadder
-from tqdm import tqdm
-from joblib import Parallel, delayed
 
 
 
@@ -26,11 +24,10 @@ def load_image(imfile):
 
 
 def viz(img, flo, count):
-    # print(f' viz called with count: {count}')
-    img = img[0].permute(1,2,0).detach().cpu().numpy()
-    flo = flo[0].permute(1,2,0).detach().cpu().numpy()
- 
-    
+    print(f' viz called with count: {count}')
+    img = img[0].permute(1,2,0).cpu().numpy()
+    flo = flo[0].permute(1,2,0).cpu().numpy()
+     
     # map flow to rgb image
     flo = flow_viz.flow_to_image(flo)
     img_flo = np.concatenate([img, flo], axis=0)
@@ -45,7 +42,7 @@ def viz(img, flo, count):
     # cv2.imshow('image', img_flo[:, :, [2,1,0]]/255.0)
     # cv2.waitKey()
 
-def proc_image_pair(imfile1, imfile2, count, model):
+def proc_image_pair(imfile1, imfile2, count):
 
     image1 = load_image(imfile1)
     image2 = load_image(imfile2)
@@ -69,9 +66,15 @@ def demo(args):
                  glob.glob(os.path.join(args.path, '*.jpg'))
         
         images = sorted(images)
-        out = Parallel(n_jobs=4)(delayed(proc_image_pair)(imfile1, imfile2, index, model) for index, (imfile1, imfile2) in enumerate(tqdm(zip(images[:-1], images[1:]))))
-        
-            
+        for imfile1, imfile2 in zip(images[:-1], images[1:]):
+            image1 = load_image(imfile1)
+            image2 = load_image(imfile2)
+
+            padder = InputPadder(image1.shape)
+            image1, image2 = padder.pad(image1, image2)
+
+            flow_low, flow_up = model(image1, image2, iters=20, test_mode=True)
+            viz(image1, flow_up)
 
 
 if __name__ == '__main__':
