@@ -49,7 +49,7 @@ def demo(args):
 
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    
+
     model = torch.nn.DataParallel(RAFT(args))
     model.load_state_dict(torch.load(args.model))
 
@@ -71,6 +71,8 @@ def demo(args):
 
             flow_low, flow_up = model(image1, image2, iters=20, test_mode=True)
             viz(image1, flow_up, index, args.out_dir)
+
+        print(f'done processing {args.path}')
 
 
 if __name__ == '__main__':
