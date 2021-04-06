@@ -13,6 +13,7 @@ from raft import RAFT
 from utils import flow_viz
 from utils.utils import InputPadder
 from pathlib import Path
+from tqdm import tqdm
 
 
 
@@ -62,7 +63,7 @@ def demo(args):
                  glob.glob(os.path.join(args.path, '*.jpg'))
         
         images = sorted(images)
-        for index, (imfile1, imfile2) in enumerate(zip(images[:-1], images[1:])):
+        for index, (imfile1, imfile2) in tqdm(enumerate(zip(images[:-1], images[1:]))):
             image1 = load_image(imfile1)
             image2 = load_image(imfile2)
 
