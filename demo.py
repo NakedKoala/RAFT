@@ -32,7 +32,7 @@ def viz(img, flo, count, out_dir):
      
     # map flow to rgb image
     flo = flow_viz.flow_to_image(flo)
-    img_flo = np.concatenate([img, flo], axis=0)
+    # img_flo = np.concatenate([img, flo], axis=0)
 
     # import matplotlib.pyplot as plt
     # plt.imshow(img_flo / 255.0)
@@ -41,7 +41,7 @@ def viz(img, flo, count, out_dir):
     # pdb.set_trace()
     # cv2.imwrite(f'/content/demo/{count}.png', img_flo[:, :, [2,1,0]]/255.0)
     
-    cv2.imwrite(str(Path(out_dir)/f'{str(count).zfill(5)}.png'), img_flo)
+    cv2.imwrite(str(Path(out_dir)/f'{str(count).zfill(5)}.png'), flo)
     # cv2.imshow('image', img_flo[:, :, [2,1,0]]/255.0)
     # cv2.waitKey()
 
