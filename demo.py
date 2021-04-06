@@ -23,7 +23,7 @@ def load_image(imfile):
     return img[None].to(DEVICE)
 
 
-def viz(img, flo, count):
+def viz(img, flo, count, out_dir):
     # print(f' viz called with count: {count}')
     img = img[0].permute(1,2,0).cpu().numpy()
     flo = flo[0].permute(1,2,0).cpu().numpy()
@@ -38,20 +38,11 @@ def viz(img, flo, count):
     # import pdb 
     # pdb.set_trace()
     # cv2.imwrite(f'/content/demo/{count}.png', img_flo[:, :, [2,1,0]]/255.0)
-    cv2.imwrite(f'/content/demo/{str(count).zfill(5)}.png', img_flo)
+    
+    cv2.imwrite(out_dir/f'{str(count).zfill(5)}.png', img_flo)
     # cv2.imshow('image', img_flo[:, :, [2,1,0]]/255.0)
     # cv2.waitKey()
 
-def proc_image_pair(imfile1, imfile2, count):
-
-    image1 = load_image(imfile1)
-    image2 = load_image(imfile2)
-
-    padder = InputPadder(image1.shape)
-    image1, image2 = padder.pad(image1, image2)
-
-    flow_low, flow_up = model(image1, image2, iters=20, test_mode=True)
-    viz(image1, flow_up, count)
 
 def demo(args):
     model = torch.nn.DataParallel(RAFT(args))
@@ -74,13 +65,14 @@ def demo(args):
             image1, image2 = padder.pad(image1, image2)
 
             flow_low, flow_up = model(image1, image2, iters=20, test_mode=True)
-            viz(image1, flow_up, index)
+            viz(image1, flow_up, index, args.out_dir)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', help="restore checkpoint")
     parser.add_argument('--path', help="dataset for evaluation")
+    parser.add_argument('--out_dir', help="dataset for evaluation")
     parser.add_argument('--small', action='store_true', help='use small model')
     parser.add_argument('--mixed_precision', action='store_true', help='use mixed precision')
     parser.add_argument('--alternate_corr', action='store_true', help='use efficent correlation implementation')
