@@ -16,7 +16,7 @@ from pathlib import Path
 
 
 
-DEVICE = 'cpu'
+DEVICE = 'cuda'
 
 def load_image(imfile):
     img = np.array(Image.open(imfile)).astype(np.uint8)
