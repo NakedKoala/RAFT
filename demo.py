@@ -46,6 +46,10 @@ def viz(img, flo, count, out_dir):
 
 
 def demo(args):
+
+    out_dir = Path(args.out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    
     model = torch.nn.DataParallel(RAFT(args))
     model.load_state_dict(torch.load(args.model))
 
